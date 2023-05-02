@@ -1,10 +1,35 @@
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
+
+import api from './src/services/api';
 
 export default function App() {
+
+  const [dados, setDados] = useState([]);
+
+  async function loadDados(){
+    const response = await api.get('verses/nvi/job/1');
+    setDados(response.data.verses);
+    
+  }
+  
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text>igreja</Text>
+      
+      <Button
+        title='Adicionar'
+        onPress={ () => loadDados()}
+      />
+
+
+      {dados.map( (item) => (
+        <Text key={item.number} > {item.text} </Text>
+      ))}
+
+
       <StatusBar style="auto" />
     </View>
   );
