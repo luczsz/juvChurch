@@ -3,6 +3,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
 import api from './src/services/api';
+import { NavigationContainer } from '@react-navigation/native';
+
+import Routes from './src/routes';
 
 export default function App() {
 
@@ -16,22 +19,10 @@ export default function App() {
   
 
   return (
-    <View style={styles.container}>
-      <Text>igreja</Text>
-      
-      <Button
-        title='Adicionar'
-        onPress={ () => loadDados()}
-      />
-
-
-      {dados.map( (item) => (
-        <Text key={item.number} > {item.text} </Text>
-      ))}
-
-
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+        <StatusBar translucent />
+        <Routes/>
+    </NavigationContainer>
   );
 }
 
