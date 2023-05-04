@@ -22,3 +22,53 @@ export const styles = StyleSheet.create({
         textTransform: 'uppercase'
     }
 });
+
+export const styled = StyleSheet.create({
+    containerModal:{
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        flex: 1,
+        
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    header:{
+        height: 60,
+        flexDirection: 'row',
+        
+        paddingLeft: 14, 
+        
+        alignItems: 'center',
+    },
+    menuModal:{
+        backgroundColor: '#fff',
+        borderRadius: 12,
+
+        height: 370,
+        width: '80%',
+
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
+    },
+    bntModal:{
+        backgroundColor: '#f5f5f5',
+        height: 40,
+
+        marginBottom: 2,
+
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    txtBntModal:{
+        color: 'black',
+        fontSize: 18,
+        
+    },
+    titleModal:{
+        color: 'black',
+        fontSize: 22,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
+})
