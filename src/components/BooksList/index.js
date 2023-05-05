@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, ScrollView, ActivityIndicator, FlatList } from 'react-native';
 
 import api from '../../services/api';
 
@@ -9,27 +9,20 @@ import { Feather } from '@expo/vector-icons';
 
 export default function BooksList({data}) {
 
+    const [versu, setVersu] = useState('');
 
     const [dados, setDados] = useState([]);
     const [capitulos, setCapitulos] = useState([]);
+    const [versiculos, setVersiculos] = useState([]);
+
     const [open, setOpen] = useState(false);
+    const [openVerse, setOpenVerse] = useState(false);
+    
     const [loading, setLoading] = useState(true);
+    const [load, setLoad] = useState(true);
 
 
-    async function capt(data){
-        const response = await api.get(`verses/nvi/${data.abbrev.pt}/4`);
-        setDados(response.data)
-        if(response.status == 200){
-            //alert('deu');
-            console.log(response.data.chapter);
-            
-            return;
-        } else{
-            alert('Não deu ' + response.status);
-            return;
-        }
-    };
-
+    // Função aonde gera os números dos capitulos dos livoros
     async function dates(data){
         setOpen(true);
         const response = await api.get(`books/${data.abbrev.pt}`)
@@ -43,9 +36,21 @@ export default function BooksList({data}) {
         });
     }
 
+    // Função que trás o resultado dos versiculos
     async function verse(chapter, data){
-        const response = await api.get(`/verses/nvi/${data.abbrev.pt}/${chapter}`)
-        console.log(response.data.verses);
+        setVersu(chapter);
+        setOpenVerse(true);
+        const response = await api.get(`/verses/nvi/${data.abbrev.pt}/${chapter}`).
+        then(item => {
+            if(item.status === 200){
+                setLoad(false);
+                setVersiculos(item.data.verses);
+                return;
+            } else{
+                alert('cert');
+                return;
+            }
+        })
     }
     
  return (
@@ -106,7 +111,41 @@ export default function BooksList({data}) {
 
 
         </Modal>
+        
+        {/* VERSOS */}
 
+        <Modal
+            //style={styled.containerModal}
+            visible={openVerse}
+            animationType='fade'
+            onRequestClose={ () => setOpenVerse(false)}
+            //transparent={true}
+        >
+            <View style={styled.headerVerse} >
+
+                    <TouchableOpacity onPress={ () => setOpenVerse(false)} >
+                    <Feather name='arrow-left-circle' size={34} color={'#DDD'} />
+                    </TouchableOpacity>
+
+                    <Text style={styled.titleVerse} > Capítulo: {versu}  </Text>
+            </View>
+
+            <View style={styled.contentVerse} >
+
+                    {load ? 
+                        <ActivityIndicator size="large" color="red" />
+                        :
+                        <FlatList
+                            data={versiculos}
+                            keyExtractor={(item) => item.number}
+                            renderItem={({item}) => <Text> {item.number} {item.text} </Text> }
+                        />
+                    }
+
+                   
+
+            </View>
+        </Modal>
     </View>
 
   );

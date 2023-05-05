@@ -14,7 +14,6 @@ export default function Bible() {
        async function loadDados(){
             const response = await api.get('/books');
             setDados(response.data);
-            console.log(response.status);
        }
        loadDados();
     },[]);

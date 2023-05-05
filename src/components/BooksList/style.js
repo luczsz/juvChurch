@@ -71,4 +71,34 @@ export const styled = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase'
     },
+
+    headerVerse:{
+        backgroundColor: 'blue',
+        height: 60,
+        width: '100%',
+        flexDirection: 'row',
+
+        alignItems: 'center',
+        //justifyContent: 'center',
+
+        paddingLeft: 12,
+        paddingRight: 12,
+    },
+    titleVerse:{
+        color: '#f5f5f5',
+        fontSize: 22,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+
+        marginLeft: 10,
+    },
+
+    contentVerse:{
+        flex: 1,
+        width: '100%',
+
+        padding: 10,
+
+        backgroundColor: '#DDD',
+    }
 })
