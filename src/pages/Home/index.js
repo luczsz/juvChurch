@@ -11,6 +11,7 @@ export default function Home() {
    <View style={styles.container} >
         <Text>Home</Text>
         <Button title='biblia' onPress={ () => navigation.navigate('Bible')} />
+        <Button title='Maps' onPress={ () => navigation.navigate('Map')} />
    </View>
   );
 }

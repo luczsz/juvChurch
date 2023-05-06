@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 
 //pages gerais
 import Bible from '../pages/Bible';
+import Maps from '../pages/Maps';
 
 export default function Routes() {
     
@@ -15,6 +16,7 @@ export default function Routes() {
         <AppStack.Navigator>
             <AppStack.Screen name='Home' component={Home} />
             <AppStack.Screen name='Bible' component={Bible} />
+            <AppStack.Screen name='Map' component={Maps} />
         </AppStack.Navigator>
   );
 }
