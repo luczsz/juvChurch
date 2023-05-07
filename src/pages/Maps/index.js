@@ -5,6 +5,7 @@ import MarketCuston from '../../components/MarketCuston';
 
 import MapView, { Marker, Polyline,  } from 'react-native-maps';
 import { Accuracy, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
+import * as Location from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 
 
@@ -67,7 +68,7 @@ export default function Maps() {
            longitude: longitude 
         });
         console.log(destination);
-     }
+     };
 
      function drect(e){
         const latitude = e.nativeEvent.coordinate.latitude;
@@ -77,17 +78,19 @@ export default function Maps() {
             latitude: latitude,
             longitude: longitude 
          });
-     }
-
-
+         getDatas();
+     };
  
     const [local, setLocal] = useState('');
     const [coords, setCoords] = useState([]);
-
+    
     
     const [origin, setOrigin] = useState({ latitude: 0, longitude: 0 });
     const [destination, setDestination] = useState(null);
     const [currentLocation, setCurrentLocation] = useState(null);
+    const [distance, setDistance] = useState(null);
+    const [duration, setDuration] = useState(null);
+    const [place, setPlace] = useState('');
     const [routes, setRoutes] = useState([]);
 
     // Pegando as coordenadas e codificando
@@ -178,10 +181,45 @@ export default function Maps() {
         );
       };
 
+    // função para calc o tempo e a distancia
+    async function getDatas(){
+        const origim = camera.center;
+        const detinat = destination;
+
+        const response = await fetch(
+           `https://maps.googleapis.com/maps/api/directions/json?origin=${origim.latitude},${origim.longitude}&destination=${detinat.latitude},${detinat.longitude}&key=${APIKEY}`
+         );
+         const data = await response.json();
+         console.log(data.routes[0].summary);
+         
+   
+         if (data.status === 'OK') {
+           const distance = data.routes[0].legs[0].distance.text;
+           const duration = data.routes[0].legs[0].duration.text;
+           const placer = data.routes[0].summary;
+           const nowPlacer = placer.replace(/ and /i, ", ");
+
+           setDistance(distance);
+           setDuration(duration);
+           setPlace(nowPlacer);
+           console.log('te');
+           return;
+        } else {
+            alert('Não foi possível obter as direções');
+            return;
+         }
+    };
+
 
     return (
    <View style={styles.container} >
         <Text> {local.latitude} </Text>
+        
+        <Text>Tempo:  {duration} </Text>
+        <Text> Distancia: {distance} </Text>
+        <Text> Local: {place} </Text>
+
+
         <MapView 
             style={styles.map}
             camera={camera}
