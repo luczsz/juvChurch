@@ -1,13 +1,96 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MarketCuston from '../../components/MarketCuston';
+
+import MapView, { Marker, Polyline,  } from 'react-native-maps';
+import { Accuracy, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
+import MapViewDirections from 'react-native-maps-directions';
+
+
 
 export default function Maps() {
+
+    const APIKEY = 'AIzaSyALvhMEnp5upeUwRASCfJeTlqyZRx-omrs';
+
+    const [camera, setCamera] = useState({
+        center:{
+            latitude: 0,
+            longitude: 0,
+        },
+        pitch: 0,
+        heading: 0,
+        altitude: 1000,
+        zoom: 16,
+    })
+
+    useEffect(() => {
+        const startTracking = async () => {
+           let { status } = await requestForegroundPermissionsAsync();
+           //Obtendo permissões de localização, é necesário que as permissões sejam concedidas para que possamos obter a localização do usuário         
+           if (status !== 'granted') {
+              alert('Permissões para acessar a localização foram negadas.');
+              return;
+           }
+           try {
+               /* A função abaixo realiza o monitoramento da posição atual do usuário de acordo com os parâmetros fornecidos
+                 e retorna uma callback sempre que obtém a localização, a partir da callback iremos obter um objeto contendo as coordenadas */
+              await watchPositionAsync({
+                 accuracy: Accuracy.Highest,
+                 timeInterval: 5000,
+                 distanceInterval: 50,
+              }, (loc) => {
+                 /*
+                    Setando o estado da câmera a partir do operador spread, pois desejamos manter as demais propriedades da câmera intactas,
+                    senão o utilizarmos o spread precisaremos definir as demais propriedas novamente, 
+                    fugindo do nosso objetivo de criar uma câmera dinâmica
+                 */
+                 setCamera( prevCamera => ({
+                    ...prevCamera,
+                    center: {
+                       latitude: loc.coords.latitude,
+                       longitude: loc.coords.longitude,
+                    }
+                 }));
+              }
+              );
+           } catch (err) {
+              console.warn('Algo deu errado...');
+           }
+        }
+        startTracking();
+     }, []);
+
+     const getDirections = (latitude, longitude) => {
+        setDestination({
+           latitude: latitude,
+           longitude: longitude 
+        });
+        console.log(destination);
+     }
+
+     function drect(e){
+        const latitude = e.nativeEvent.coordinate.latitude;
+        const longitude = e.nativeEvent.coordinate.longitude;
+
+        setDestination({
+            latitude: latitude,
+            longitude: longitude 
+         });
+     }
+
+
  
     const [local, setLocal] = useState('');
     const [coords, setCoords] = useState([]);
 
+    
+    const [origin, setOrigin] = useState({ latitude: 0, longitude: 0 });
+    const [destination, setDestination] = useState(null);
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [routes, setRoutes] = useState([]);
+
+    // Pegando as coordenadas e codificando
     async function onMapPress(coordinate){
         const latitude = coordinate.nativeEvent.coordinate.latitude;
         const longitude = coordinate.nativeEvent.coordinate.longitude;
@@ -36,6 +119,7 @@ export default function Maps() {
         }
     };
 
+    // decodificando as coordenadas
     const decodePolyline = (encoded) => {
         let index = 0;
         const len = encoded.length;
@@ -74,16 +158,39 @@ export default function Maps() {
 
     return points;
      };
-
+    
+     // um teste
     function retur( coordinate ){
         setLocal(coordinate.nativeEvent.coordinate);
     }
- 
+    
+    //Buscar a rota entre pontos A e X
+    const handleGetDirections = () => {
+              (
+          {
+            origin: `${origin.latitude},${origin.longitude}`,
+            destination: `${destination.latitude},${destination.longitude}`,
+            key: 'AIzaSyALvhMEnp5upeUwRASCfJeTlqyZRx-omrs',
+          },
+          (result) => {
+            setRoutes(result.routes[0].coordinates);
+          }
+        );
+      };
+
+
     return (
    <View style={styles.container} >
         <Text> {local.latitude} </Text>
         <MapView 
             style={styles.map}
+            camera={camera}
+            showsUserLocation={true}
+            showsMyLocationButton={false}
+            zoomControlEnabled={true}
+            loadingEnabled={true}
+            loadingBackgroundColor={'#fff'}
+            toolbarEnabled={false}
             initialRegion={{
                 latitude: -3.77581,
                 longitude: -38.61827,
@@ -91,10 +198,57 @@ export default function Maps() {
                 longitudeDelta: 0.0421,
             }}
             onRegionChange={ (coordinate) => setLocal(coordinate)}
-            onPress={ (coordinate) => onMapPress(coordinate) }
+            onPress={(e) => drect(e) }
         >
-            <Marker coordinate={{ latitude: -3.77581, longitude: -38.61827 }} />
-            <Polyline coordinates={coords} strokeWidth={5} strokeColor="blue" /> 
+
+                <MarketCuston 
+                    latitude={ -3.77662 }
+                    longitude={ -38.61800 }
+                    color={'#0096ba'}
+                    id={'1'}
+                    onPress={ getDirections }
+                >
+
+                </MarketCuston>
+                
+                <MarketCuston 
+                    latitude={ -3.7704822 }
+                    longitude={ -38.6161906 }
+                    color={'#0096'}
+                    id={'2'}
+                    onPress={ getDirections }
+                >
+
+                </MarketCuston>
+                
+                {destination ?
+                   <MapViewDirections
+                   origin={
+                      camera.center
+                   }
+                   destination={
+                      destination
+                   }
+                   apikey={APIKEY}
+                   strokeWidth={3}
+                   strokeColor="#4285F4"
+                   lineDashPattern={[0]}
+                   //Define se o Google Maps API deve reorganizar os waypoints para obter uma rota mais rápida
+                   optimizeWaypoints={true}
+                   /* Define se a MapView.Polilyne deve resetar ou não na hora de calcular a rota, 
+                      se as linhas apresentarem bugs sete o valor para false*/
+                   resetOnChange={false}
+                   //Definindo uma rota com maior precisão, evitando que a rota mostrada "corte caminho" pelo mapa
+                   precision={'high'}
+                   onError={(errorMessage) => {
+                      alert('Erro ao obter direções...');
+                   }}
+                >
+                </MapViewDirections>
+                  :
+                  null
+               }
+
         </MapView> 
     </View>
   );
