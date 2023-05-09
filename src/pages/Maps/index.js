@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Button } from 'react-native';
 
 import MarketCuston from '../../components/MarketCuston';
 
@@ -82,6 +82,7 @@ export default function Maps() {
      };
  
     const [local, setLocal] = useState('');
+    const [geo, setGeo] = useState('');
     const [coords, setCoords] = useState([]);
     
     
@@ -91,6 +92,7 @@ export default function Maps() {
     const [distance, setDistance] = useState(null);
     const [duration, setDuration] = useState(null);
     const [place, setPlace] = useState('');
+    const [address, setAddress] = useState('');
     const [routes, setRoutes] = useState([]);
 
     // Pegando as coordenadas e codificando
@@ -202,7 +204,7 @@ export default function Maps() {
            setDistance(distance);
            setDuration(duration);
            setPlace(nowPlacer);
-           console.log('te');
+           //console.log('te');
            return;
         } else {
             alert('Não foi possível obter as direções');
@@ -210,14 +212,48 @@ export default function Maps() {
          }
     };
 
+    // Função de pegar um endereço do clt
+    async function getRedirect(){
+       const response = await fetch(
+         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${APIKEY}`
+       );
+
+       const data = await response.json();
+       const lat = data.results[0].geometry.location.lat;
+       const lng = data.results[0].geometry.location.lng;
+       const end = data.results[0].formatted_address;
+       setDestination({
+         latitude: lat,
+         longitude: lng 
+      });
+       setGeo(end);
+       getDatas();
+       console.log(end);
+    }
+
 
     return (
    <View style={styles.container} >
+
+         <TextInput
+            placeholder='Insira o destino'
+            style={styles.input}
+            value={address}
+            onChangeText={ (text) => setAddress(text)}
+         />
+         <Button
+            title='F I N D'
+            onPress={ () => getRedirect()}
+         />
+
+
+
         <Text> {local.latitude} </Text>
         
         <Text>Tempo:  {duration} </Text>
         <Text> Distancia: {distance} </Text>
         <Text> Local: {place} </Text>
+        <Text> Geo: {geo} </Text>
 
 
         <MapView 
@@ -250,8 +286,8 @@ export default function Maps() {
                 </MarketCuston>
                 
                 <MarketCuston 
-                    latitude={ -3.7704822 }
-                    longitude={ -38.6161906 }
+                    latitude={ destination.latitude }
+                    longitude={ destination.longitude }
                     color={'#0096'}
                     id={'2'}
                     onPress={ getDirections }
@@ -301,8 +337,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     map:{
-        width: '80%',
-        height: '80%',
+        width: '95%',
+        height: '50%',
+    },
+    input:{
+      backgroundColor: '#d9d9d9',
+      height: 60,
+      width: '80%',
+      paddingLeft: 14,
     }
   });
   
