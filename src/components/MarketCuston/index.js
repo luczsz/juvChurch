@@ -8,6 +8,7 @@ function CustomMarker(
     latitude,
     longitude,
     color,
+    geo,
     onPress,
   })  {
 
@@ -47,7 +48,14 @@ function CustomMarker(
         </View>
       </View>
       {/* Caso queira customizar totalmente a aparência de um Callout através de seus filhos, atribua à ele a propriedade tooltip=true */}
-      
+      <Callout style={styles.callout}>
+        <View>
+          <Text style={styles.title}>Meu primeiro marcador :D </Text>
+          <Text>Latitude: {latitude}</Text>
+          <Text>Longitude: {longitude}</Text>
+          <Text>teste: {geo}</Text>
+        </View>
+      </Callout>
     </Marker>
   );
 }

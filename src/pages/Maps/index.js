@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, StyleSheet, Text, TextInput, Button } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Button, TouchableOpacity } from 'react-native';
 
 import MarketCuston from '../../components/MarketCuston';
 
@@ -7,6 +7,7 @@ import MapView, { Marker, Polyline,  } from 'react-native-maps';
 import { Accuracy, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
 import * as Location from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 
 
@@ -94,6 +95,7 @@ export default function Maps() {
     const [place, setPlace] = useState('');
     const [address, setAddress] = useState('');
     const [routes, setRoutes] = useState([]);
+    const [states, setStates] = useState([]);
 
     // Pegando as coordenadas e codificando
     async function onMapPress(coordinate){
@@ -229,6 +231,41 @@ export default function Maps() {
        setGeo(end);
        getDatas();
        console.log(end);
+    };
+
+   //Função de autocomplet de endereços
+
+    function autoText( text ){
+         setAddress(text);
+         if(text.length >= 3){
+            autoComplet(text);
+         }
+    }
+
+    async function autoComplet(text){
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${APIKEY}&input=${text}`;
+      const response = await fetch(url);
+
+      const data = await response.json();
+      console.log(data.predictions);
+      setStates(data.predictions);
+    };
+
+    async function textPress(item){
+      const placeId = item.place_id;
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?key=${APIKEY}&place_id=${placeId}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const { lat, lng } = data.result.geometry.location;
+      /* console.log('Latitude:', lat);
+      console.log('Longitude:', lng);
+      console.log(data.result.formatted_address);*/
+      setDestination({
+         latitude: lat,
+         longitude: lng 
+      });
+      getDatas();
+      setGeo(data.result.formatted_address);
     }
 
 
@@ -239,14 +276,25 @@ export default function Maps() {
             placeholder='Insira o destino'
             style={styles.input}
             value={address}
-            onChangeText={ (text) => setAddress(text)}
+            onChangeText={ (text) => autoText(text)}
          />
          <Button
             title='F I N D'
-            onPress={ () => getRedirect()}
+            onPress={ () => autoComplet()}   
          />
 
+         {states.map( (item) => (
+            
+            <TouchableOpacity 
+               key={item.place_id}
+               onPress={ () => textPress(item)}
+               style={ styles.places}
+            >
+               <Text key={item.place_id} > {item.description}</Text>
+            </TouchableOpacity>
 
+         ))}
+         
 
         <Text> {local.latitude} </Text>
         
@@ -285,15 +333,21 @@ export default function Maps() {
 
                 </MarketCuston>
                 
-                <MarketCuston 
-                    latitude={ destination.latitude }
-                    longitude={ destination.longitude }
-                    color={'#0096'}
-                    id={'2'}
-                    onPress={ getDirections }
-                >
+                 {destination ? 
+                  <MarketCuston 
+                     latitude={ destination.latitude }
+                     longitude={ destination.longitude }
+                     color={'#0096'}
+                     id={'2'}
+                     geo={geo}
+                     onPress={ getDirections }
+                  >
 
-                </MarketCuston>
+                  </MarketCuston>
+                  :
+                  null  
+               }
+
                 
                 {destination ?
                    <MapViewDirections
@@ -318,7 +372,7 @@ export default function Maps() {
                       alert('Erro ao obter direções...');
                    }}
                 >
-                </MapViewDirections>
+                   </MapViewDirections>
                   :
                   null
                }
@@ -345,6 +399,15 @@ const styles = StyleSheet.create({
       height: 60,
       width: '80%',
       paddingLeft: 14,
+    },
+    places:{
+      backgroundColor: '#DDD',
+      height: 40,
+      width: '62%',
+
+      padding: 12,
+      marginTop: 14,
+      marginBottom: 14,
     }
   });
   
