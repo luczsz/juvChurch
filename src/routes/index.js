@@ -14,7 +14,7 @@ export default function Routes() {
 
     return (
         <AppStack.Navigator>
-            <AppStack.Screen name='Home' component={Home} />
+            <AppStack.Screen name='Home' component={Home} options={{ headerShown: false, }} />
             <AppStack.Screen name='Bible' component={Bible} />
             <AppStack.Screen name='Map' component={Maps} />
         </AppStack.Navigator>
