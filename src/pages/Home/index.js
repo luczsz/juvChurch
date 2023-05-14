@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, Image } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
+import { stores } from '../../components/list';
 
 export default function Home() {
     
@@ -23,8 +24,13 @@ export default function Home() {
         </View>
       </View>
 
-      <View>
-          <Text> Stores </Text>
+      <View style={styles.stores} >
+          {stores.map( (item) => (
+            <View style={styles.content} >
+              <Image source={{ uri: item.profile }} style={styles.profile} />
+              <Text key={item.id} style={styles.username} > {item.username} </Text>
+            </View>
+          ) )}
       </View>
       
       <View>
@@ -59,6 +65,39 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
 //      borderBottomWidth: 1,
 //      borderBottomColor: '#DDD',
+    },
+    
+    stores:{
+      //backgroundColor: '#DDD',
+      flexDirection: 'row',
+      marginTop: -12,
+
+      paddingLeft: 12,
+      paddingRight: 12,
+
+      borderBottomWidth: 1,
+      borderBottomColor: '#DDD',
+    },
+
+    content:{
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      padding: 10,
+    },
+
+    profile:{
+      width: 80,
+      height: 80,
+
+      borderRadius: 50,
+      borderWidth: 2,
+      borderColor: 'black',
+    },
+
+    username:{
+      fontSize: 12,
+      fontWeight: 'bold'
     }
   });
   
