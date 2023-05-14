@@ -6,21 +6,16 @@ import api from './src/services/api';
 import { NavigationContainer } from '@react-navigation/native';
 
 import Routes from './src/routes';
+import { theme } from './src/global/theme';
 
 export default function App() {
 
   const [dados, setDados] = useState([]);
-
-  async function loadDados(){
-    const response = await api.get('verses/nvi/job/1');
-    setDados(response.data.verses);
-    
-  }
   
 
   return (
     <NavigationContainer>
-        <StatusBar translucent />
+        <StatusBar translucent style='light' backgroundColor={theme.colors.primary} />
         <Routes/>
     </NavigationContainer>
   );
