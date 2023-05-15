@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, Image, TouchableOpacity, Touchable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, Image, TouchableOpacity, Touchable, ScrollView, FlatList } from 'react-native';
 
 import { theme } from '../../global/theme';
 import { styles } from './style';
@@ -7,8 +7,9 @@ import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 
-import { stores } from '../../components/list';
+import { stores, post } from '../../components/list';
 import Logo from '../../components/Logo';
+import PostFeed from '../../components/PostFeed';
 
 export default function Home() {
     
@@ -53,7 +54,11 @@ export default function Home() {
       </View>
       
       <View style={styles.feed} >
-          <Text> Content </Text>
+        <FlatList
+            data={post}
+            keyExtractor={ (item) => item.id}
+            renderItem={({item}) => <PostFeed  data={item} />}
+          />
       </View>
       
       <View>

@@ -95,6 +95,10 @@ contentStores:{
 feed:{
       backgroundColor: theme.colors.secondary100,
       flex: 1,
+
+      paddingLeft: 12,
+      paddingRight: 12,
+      marginBottom: 50,
     }
 
 })
