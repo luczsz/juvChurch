@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { theme } from '../global/theme';
 
 //pages centrais
 import Home from '../pages/Home';
@@ -10,7 +11,7 @@ import Home from '../pages/Home';
 //pages gerais
 import Bible from '../pages/Bible';
 import Maps from '../pages/Maps';
-import { theme } from '../global/theme';
+import Account from '../pages/Account';
 
 export default function Routes() {
     
@@ -75,6 +76,20 @@ export default function Routes() {
                             return <Ionicons name="location" size={24} color={theme.colors.primary} />
                         }
                             return <Ionicons name="location-outline" size={24} color="#DDD" />
+    
+                        }
+                    }}
+                />
+                <TabStack.Screen 
+                    name='Account' 
+                    component={Account}
+                    options={{
+                        headerShown: false,
+                        tabBarIcon: ({ color, size, focused}) => {
+                            if(focused){
+                            return <Ionicons name="people-circle" size={24} color={theme.colors.primary} />
+                        }
+                            return <Ionicons name="people-circle-outline" size={24} color="#DDD" />
     
                         }
                     }}
